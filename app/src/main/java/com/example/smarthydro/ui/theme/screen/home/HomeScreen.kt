@@ -10,14 +10,18 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,8 +35,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -265,7 +272,7 @@ fun FeatureItem(
                 modifier = Modifier
                     .clickable {
                         // Handle the click
-                        readingViewModel.setReadingType(ReadingType(feature.title,sensorData,""))
+                        readingViewModel.setReadingType(ReadingType(feature.title, sensorData, ""))
                         navController.navigate("viewData")
                     }
                     .align(Alignment.BottomEnd)
@@ -273,6 +280,60 @@ fun FeatureItem(
                     .background(ButtonBlue)
                     .padding(vertical = 6.dp, horizontal = 15.dp)
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun SensorCard(
+
+){
+    val feature = Feature(
+        title = "Water",
+        R.drawable.ic_waterlv,
+        BlueViolet1,
+        BlueViolet2,
+        BlueViolet3
+    )
+    Card(
+        //shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(8.dp),
+        // modifier = modifier.size(280.dp, 240.dp)
+        modifier = Modifier.padding(10.dp,5.dp,10.dp,10.dp),
+        //set card elevation of the card
+        elevation = CardDefaults.cardElevation(
+            defaultElevation =  10.dp,
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor =  MaterialTheme.colorScheme.primaryContainer,
+        ),
+    ) {
+        Column(modifier = Modifier.clickable(onClick = {  })) {
+
+            Icon(
+                painter = painterResource(id = feature.iconId),
+                contentDescription = feature.title,
+                tint = Color.White,
+            )
+
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Title",
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Text(
+                    text = "Sub title Example code for android + composes app developers.",
+                    //maxLines = 1,
+                    //overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleSmall,
+                )
+            }
         }
     }
 }
