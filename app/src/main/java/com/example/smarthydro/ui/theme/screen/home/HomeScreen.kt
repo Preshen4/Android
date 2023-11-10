@@ -2,6 +2,7 @@ package com.example.smarthydro.ui.theme.screen.home
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,13 +18,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,8 +48,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.smarthydro.ui.theme.Beige1
 import com.example.smarthydro.ui.theme.Beige2
@@ -72,6 +82,7 @@ import com.example.smarthydro.viewmodels.SensorViewModel
 private const val GET_SENSOR_DATA_DELAY_MS: Long = 15 * 1000
 
 // https://youtu.be/g5-wzZUnIbQ
+
 @ExperimentalFoundationApi
 @Composable
 fun HomeScreen(viewModel: SensorViewModel,navController: NavHostController, readingViewModel: ReadingViewModel) {
@@ -85,19 +96,18 @@ fun HomeScreen(viewModel: SensorViewModel,navController: NavHostController, read
             .fillMaxSize()
     ) {
         Column {
-            GreetingSection()
-            FeatureSection(
+            CardSection(
                 features = listOf(
                     Feature(
                         title = "Water",
-                        R.drawable.ic_waterlv,
+                        R.drawable.ic_water,
                         BlueViolet1,
                         BlueViolet2,
                         BlueViolet3
                     ),
                     Feature(
-                        title = "PH",
-                        R.drawable.ic_phlv,
+                        title = "Clean Water",
+                        R.drawable.ic_chemical,
                         LightGreen1,
                         LightGreen2,
                         LightGreen3
@@ -111,21 +121,21 @@ fun HomeScreen(viewModel: SensorViewModel,navController: NavHostController, read
                     ),
                     Feature(
                         title = "Humidity",
-                        R.drawable.ic_humidity,
+                        R.drawable.ic_fire,
                         Beige1,
                         Beige2,
                         Beige3
                     ),
                     Feature(
-                        title = "EC",
-                        R.drawable.ic_ec,
+                        title = "Compost",
+                        R.drawable.ic_plant,
                         Purple200,
                         Purple500,
                         Purple700
                     ),
                     Feature(
-                        title = "Light",
-                        R.drawable.ic_light,
+                        title = "Sunlight",
+                        R.drawable.ic_sun,
                         Red1,
                         Red2,
                         Red3
@@ -137,49 +147,17 @@ fun HomeScreen(viewModel: SensorViewModel,navController: NavHostController, read
     }
 }
 
-@Composable
-fun GreetingSection(
-    name: String = "Farmer"
-) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Hello, $name",
-                style = MaterialTheme.typography.headlineLarge
-            )
-            Text(
-                text = "We wish you have a good day!",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
-}
-
 @ExperimentalFoundationApi
 @Composable
-fun FeatureSection(features: List<Feature>, navController: NavHostController, readingViewModel: ReadingViewModel, sensorData: SensorModel) {
+fun CardSection(features: List<Feature>, navController: NavHostController, readingViewModel: ReadingViewModel, sensorData: SensorModel) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Features",
-            color = Color.White,
-            style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier.padding(15.dp,15.dp,15.dp,20.dp)
-        )
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(1),
             contentPadding = PaddingValues(start = 7.5.dp, end = 7.5.dp, bottom = 100.dp),
             modifier = Modifier.fillMaxHeight()
         ) {
             items(features.size) {
-                FeatureItem(feature = features[it],navController, readingViewModel = readingViewModel, sensorData)
+                SensorCard(feature = features[it],navController, readingViewModel = readingViewModel, sensorData)
             }
         }
     }
@@ -283,55 +261,115 @@ fun FeatureItem(
         }
     }
 }
-
-@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SensorCard(
-
-){
-    val feature = Feature(
-        title = "Water",
-        R.drawable.ic_waterlv,
-        BlueViolet1,
-        BlueViolet2,
-        BlueViolet3
-    )
-    Card(
-        //shape = MaterialTheme.shapes.medium,
-        shape = RoundedCornerShape(8.dp),
-        // modifier = modifier.size(280.dp, 240.dp)
-        modifier = Modifier.padding(10.dp,5.dp,10.dp,10.dp),
-        //set card elevation of the card
-        elevation = CardDefaults.cardElevation(
-            defaultElevation =  10.dp,
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.primaryContainer,
-        ),
+    feature: Feature,
+    navController: NavHostController,
+    readingViewModel: ReadingViewModel,
+    sensorData: SensorModel
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = Color(feature.darkColor.value),
+        modifier = Modifier
+            .height(150.dp)
+            .padding(10.dp),
+        shadowElevation = 10.dp,
+        onClick = {
+            readingViewModel.setReadingType(ReadingType(feature.title, sensorData, ""))
+            navController.navigate("viewData")
+        }
     ) {
-        Column(modifier = Modifier.clickable(onClick = {  })) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            val width = size.width
+            val height = size.height
+            // Medium colored path
+            val mediumColoredPoint1 = Offset(0f, height * 0.3f)
+            val mediumColoredPoint2 = Offset(width * 0.1f, height * 0.35f)
+            val mediumColoredPoint3 = Offset(width * 0.4f, height * 0.05f)
+            val mediumColoredPoint4 = Offset(width * 0.75f, height * 0.7f)
+            val mediumColoredPoint5 = Offset(width * 1.4f, -height)
 
-            Icon(
-                painter = painterResource(id = feature.iconId),
-                contentDescription = feature.title,
-                tint = Color.White,
+            val mediumColoredPath = Path().apply {
+                moveTo(mediumColoredPoint1.x, mediumColoredPoint1.y)
+                standardQuadFromTo(mediumColoredPoint1, mediumColoredPoint2)
+                standardQuadFromTo(mediumColoredPoint2, mediumColoredPoint3)
+                standardQuadFromTo(mediumColoredPoint3, mediumColoredPoint4)
+                standardQuadFromTo(mediumColoredPoint4, mediumColoredPoint5)
+                lineTo(width + 100f, height + 100f)
+                lineTo(-100f, height + 100f)
+                close()
+            }
+
+            // Light colored path
+            val lightPoint1 = Offset(0f, height * 0.35f)
+            val lightPoint2 = Offset(width * 0.1f, height * 0.4f)
+            val lightPoint3 = Offset(width * 0.3f, height * 0.35f)
+            val lightPoint4 = Offset(width * 0.65f, height)
+            val lightPoint5 = Offset(width * 1.4f, -height / 3f)
+
+            val lightColoredPath = Path().apply {
+                moveTo(lightPoint1.x, lightPoint1.y)
+                standardQuadFromTo(lightPoint1, lightPoint2)
+                standardQuadFromTo(lightPoint2, lightPoint3)
+                standardQuadFromTo(lightPoint3, lightPoint4)
+                standardQuadFromTo(lightPoint4, lightPoint5)
+                lineTo(width + 100f, height + 100f)
+                lineTo(-100f, height + 100f)
+                close()
+            }
+            drawPath(
+                path = mediumColoredPath,
+                color = feature.mediumColor
             )
-
-            Column(modifier = Modifier.padding(16.dp)) {
+            drawPath(
+                path = lightColoredPath,
+                color = feature.lightColor
+            )
+        }
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(2f),
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text(
-                    text = "Title",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    text = feature.title,
+                    fontSize =  24.sp,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold
                 )
 
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    Icon(
+                        painter = painterResource(id = feature.iconId),
+                        contentDescription = null,
+                        modifier = Modifier.size(width = 100.dp, height = 140.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.size(width = 100.dp, height = 140.dp)
+            ) {
                 Text(
-                    text = "Sub title Example code for android + composes app developers.",
-                    //maxLines = 1,
-                    //overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall,
+                    text = "Sensor Reading",
+                    modifier = Modifier.wrapContentSize(),
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         }
