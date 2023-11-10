@@ -367,9 +367,9 @@ fun SensorCard(
                 modifier = Modifier.size(width = 100.dp, height = 140.dp)
             ) {
                 Text(
-                    text = "Sensor Reading",
+                    text = "60",
                     modifier = Modifier.wrapContentSize(),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                 )
             }
         }
